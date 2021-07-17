@@ -19,10 +19,13 @@ pub struct TkWatcher {
 impl TkWatcher {
     pub fn start() -> TkWatcher {
         use self::notify::Watcher;
+        // Most of this is minimized nonsense, but changing it affects the program behaviour
         let (cmdtx, cmdrx) = channel::<Arc<Mutex<()>>>();
         let (tx, rx) = channel();
 
         thread::Builder::new().name("TkWatcher".to_string()).spawn(move || {
+            // Starting this notify watcher in another thread seems to be needed
+            // to trigger the problem.
 
             let mut watcher: notify::RecommendedWatcher = notify::Watcher::new(tx, Duration::from_secs(1)).unwrap();
             std::thread::park();
